@@ -1,0 +1,48 @@
+name: Security and Quality Pipeline
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  security-and-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      # --- STAGE 1: Secrets Detection (Gitleaks) ---
+      - name: Security - Gitleaks
+        run: |
+          docker run --rm -v ${PWD}:/code:Z zricethezav/gitleaks:latest detect --source=/code -v
+
+      # --- STAGE 2: Infrastructure Scan (Checkov) ---
+      - name: Check for IaC Files
+        id: check_iac
+        run: |
+          if [ -n "$(find . -name '*.tf' -print -quit)" ] || [ -f Dockerfile ]; then
+            echo "iac_files_exist=true" >> $GITHUB_OUTPUT
+          else
+            echo "iac_files_exist=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Security - Checkov
+        if: steps.check_iac.outputs.iac_files_exist == 'true'
+        run: |
+          docker run --rm -v ${PWD}:/tf:Z bridgecrew/checkov:latest -d /tf --skip-check CKV_AWS_1
+
+      # --- STAGE 3: Vulnerability Scan (Trivy) ---
+      - name: Security - Trivy
+        run: |
+          # Create cache dir for Trivy
+          mkdir -p /tmp/trivy
+          # Run Trivy (Removed :Z as GitHub runners don't usually require SELinux labels, but kept logic same)
+          docker run --rm -v /tmp/trivy:/root/.cache/ -v ${PWD}:/src aquasec/trivy:latest fs /src --exit-code 1 --severity CRITICAL
+
