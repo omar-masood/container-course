@@ -1,16 +1,16 @@
 from flask import Flask
 import os
 import socket
-
+# initiate the flas app
 app = Flask(__name__)
 
 # Configurable via environment variable
 GREETING = os.environ.get("GREETING", "Hello")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 # TODO: Replace "YOUR_NAME_HERE" with your actual name!
-STUDENT_NAME = os.environ.get("STUDENT_NAME", "YOUR_NAME_HERE")
+STUDENT_NAME = os.environ.get("STUDENT_NAME", "omar")
 # TODO: Replace with your GitHub username
-GITHUB_USERNAME = "YOUR_GITHUB_USERNAME"
+GITHUB_USERNAME = "omar-masood"
 
 @app.route("/")
 def home():
@@ -59,6 +59,7 @@ def student():
     }
 
 if __name__ == "__main__":
+    print("main function called")
     port = int(os.environ.get("PORT", 5000))
     print(f"Starting server on port {port}...")
     app.run(host="0.0.0.0", port=port)
