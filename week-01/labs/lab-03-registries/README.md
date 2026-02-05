@@ -237,13 +237,13 @@ After pushing your container to GHCR, you need to submit it to the master deploy
 
 ### Step 1: Fork the Deployment Repository
 
-1. Go to: `https://github.com/YOUR_INSTRUCTOR/container-course-deployment`
+1. Go to: `https://github.com/ziyotek-edu/container-gitops`
 2. Click "Fork" to create your own copy
 3. Clone your fork locally:
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/container-course-deployment
-cd container-course-deployment
+git clone https://github.com/YOUR_GITHUB_USERNAME/container-gitops
+cd container-gitops
 ```
 
 ### Step 2: Add Your Container to the Deployment List
