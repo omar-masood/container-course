@@ -8,7 +8,12 @@
       "moby": false,
       "dockerDashComposeVersion": "v2"
     },
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "version": "1.35",
+      "helm": "3.17",
+      "minikube": "none"
+    }
   },
 
   "customizations": {
@@ -31,11 +36,12 @@
 
   "remoteUser": "vscode",
 
-  "forwardPorts": [8000, 8080, 5000],
+  "forwardPorts": [8000, 8080, 5000, 8200],
 
   "portsAttributes": {
     "8000": { "label": "Python App", "onAutoForward": "notify" },
     "8080": { "label": "Web Server", "onAutoForward": "notify" },
-    "5000": { "label": "Flask App", "onAutoForward": "notify" }
+    "5000": { "label": "Flask App", "onAutoForward": "notify" },
+    "8200": { "label": "Vault UI", "onAutoForward": "notify" }
   }
 }

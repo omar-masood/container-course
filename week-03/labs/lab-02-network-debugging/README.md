@@ -9,6 +9,17 @@
 
 You've been handed a three-tier application: a frontend web server, a backend API, and a database. The Compose file has **three networking problems**. The application doesn't work. Your job is to find and fix each issue.
 
+### Useful Documentation
+
+The answers to every bug in this lab are in the official Docker docs. Get comfortable reading them — this is how you'll solve real problems on the job.
+
+- [Networking in Compose](https://docs.docker.com/compose/how-tos/networking/) — How Compose creates networks and how service discovery works
+- [Compose file: networks](https://docs.docker.com/reference/compose-file/networks/) — The `networks` key in a Compose file
+- [Bridge network driver](https://docs.docker.com/engine/network/drivers/bridge/) — How bridge networks isolate containers and provide DNS resolution
+- [Compose file: services](https://docs.docker.com/reference/compose-file/services/) — Service configuration including `environment`, `healthcheck`, `depends_on`
+- [Environment variables in Compose](https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/) — How to set and manage env vars
+- [docker network inspect](https://docs.docker.com/reference/cli/docker/network/inspect/) — Inspect a network to see which containers are connected
+
 ---
 
 ## Setup
@@ -53,7 +64,7 @@ Three services, three hops:
 2. **api** — Python Flask app, connects to `db:3306`, serves JSON
 3. **db** — MySQL, stores data
 
-Each hop is a potential failure point.
+Each hop is a potential failure point. Read [Networking in Compose](https://docs.docker.com/compose/how-tos/networking/) to understand how containers on the same network discover each other by service name.
 
 ---
 
@@ -130,7 +141,7 @@ docker network inspect starter_frontend-net
 docker network inspect starter_backend-net
 ```
 
-Look at which containers are connected to which networks. Services can only communicate if they share at least one network.
+Look at which containers are connected to which networks. Services can only communicate if they share at least one network. The docs on [bridge networks](https://docs.docker.com/engine/network/drivers/bridge/) explain why — each user-defined bridge is an isolated network segment with its own DNS resolver. Read the [`docker network inspect` reference](https://docs.docker.com/reference/cli/docker/network/inspect/) to understand the output.
 
 ### Check 5: Inspect the nginx Config
 
@@ -146,10 +157,10 @@ What port is nginx proxying to? Does it match the port the API is listening on?
 
 Open `docker-compose.yml` and `frontend/nginx.conf`. There are **three problems** across these files. Use the debugging output from Part 2 to guide you.
 
-**Hints for what to look for:**
-- Which services are on which networks?
-- Do all services that need to talk share a network?
-- Do the hostnames in environment variables match actual service names?
+**Hints for what to look for** (the docs will help you understand each one):
+- Which services are on which networks? See [Compose file: networks](https://docs.docker.com/reference/compose-file/networks/)
+- Do all services that need to talk share a network? See [Networking in Compose](https://docs.docker.com/compose/how-tos/networking/)
+- Do the hostnames in environment variables match actual service names? See [Environment variables in Compose](https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/)
 - Do the ports in the nginx config match what the API actually listens on?
 
 ### Fixing
@@ -191,7 +202,7 @@ Verify that the frontend **cannot** directly reach the database (good security p
 docker compose exec frontend sh -c "nc -zv db 3306 2>&1 || echo 'Good: frontend cannot reach db directly'"
 ```
 
-If the frontend can't reach the database, your network segmentation is working correctly.
+If the frontend can't reach the database, your network segmentation is working correctly. This is the whole point of user-defined bridge networks — read [Bridge network driver](https://docs.docker.com/engine/network/drivers/bridge/) to understand why the default bridge behaves differently from user-defined bridges.
 
 ---
 

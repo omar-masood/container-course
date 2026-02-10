@@ -56,7 +56,7 @@ See [Week 1 Installation Guide](./week-01/INSTALL-DOCKER.md) for Docker CE setup
 - Pushing to Docker Hub and GHCR
 
 ### Week 2: Dockerfile Mastery
-📁 week-02/ *(coming soon)*
+📁 week-02/
 
 - Layer caching and optimization
 - Multi-stage builds
@@ -64,7 +64,7 @@ See [Week 1 Installation Guide](./week-01/INSTALL-DOCKER.md) for Docker CE setup
 - Image size reduction
 
 ### Week 3: Compose & Local Development
-📁 week-03/ *(coming soon)*
+📁 week-03/
 
 - Multi-container applications
 - Service discovery
@@ -72,7 +72,7 @@ See [Week 1 Installation Guide](./week-01/INSTALL-DOCKER.md) for Docker CE setup
 - Development workflows
 
 ### Week 4: Kubernetes Architecture
-📁 week-04/ *(coming soon)*
+📁 week-04/
 
 - Control plane components
 - Pods, Deployments, Services
