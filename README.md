@@ -80,7 +80,7 @@ See [Week 1 Installation Guide](./week-01/INSTALL-DOCKER.md) for Docker CE setup
 - Rolling updates
 
 ### Week 5: Configuration & State
-📁 week-05/ *(coming soon)*
+📁 [week-05/](./week-05/)
 
 - ConfigMaps and Secrets
 - PersistentVolumeClaims
@@ -88,7 +88,7 @@ See [Week 1 Installation Guide](./week-01/INSTALL-DOCKER.md) for Docker CE setup
 - 12-factor app principles
 
 ### Week 6: Networking & Security
-📁 week-06/ *(coming soon)*
+📁 [week-06/](./week-06/)
 
 - Service discovery and DNS
 - Ingress controllers
@@ -96,11 +96,11 @@ See [Week 1 Installation Guide](./week-01/INSTALL-DOCKER.md) for Docker CE setup
 - Pod security
 
 ### Week 7: Helm & Kustomize
-📁 week-07/ *(coming soon)*
+📁 [week-07/](./week-07/) *(draft)*
 
-- Helm charts and values
-- Kustomize bases and overlays
-- When to use which
+- Production Kustomize patterns: bases, overlays, and components
+- Patching, image tag/digest pinning, and eliminating dev/prod drift
+- Build a Redis-backed metrics exporter and scrape it with Prometheus
 
 ### Week 8: GitOps & Capstone
 📁 week-08/ *(coming soon)*

@@ -1,0 +1,36 @@
+# Stretch Goal: Creative Mode Server
+# A second Minecraft server running alongside the survival server.
+# Different namespace, different NodePort, different game settings.
+
+workloadAsStatefulSet: true
+
+resources:
+  requests:
+    memory: 1536Mi
+    cpu: 500m
+  limits:
+    memory: 1536Mi
+    cpu: 1000m
+
+persistence:
+  dataDir:
+    enabled: true
+    Size: 2Gi
+
+minecraftServer:
+  eula: "TRUE"
+  version: "LATEST"
+  type: VANILLA
+  gameMode: creative
+  difficulty: peaceful
+  maxPlayers: 10
+  pvp: false
+  motd: "Creative Mode - Build Anything!"
+  memory: 1024M
+  serviceType: NodePort
+  nodePort: 30566
+  rcon:
+    enabled: true
+    password: "k8s-creative-rcon"
+    port: 25575
+    serviceType: ClusterIP

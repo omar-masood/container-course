@@ -1,0 +1,285 @@
+# ============================================================
+# Jerry's Broken Cluster — SOLUTIONS
+# ============================================================
+# Each fix is annotated with what was wrong and how to
+# identify it using k9s.
+# ============================================================
+
+---
+# --- Scenario 1: website ---
+# PROBLEM: Image tag nginx:v999 doesn't exist → ImagePullBackOff
+# K9S: :pod → select pod → d (describe) → Events show "pull failed"
+# FIX: Change image to nginx:1.27
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website
+  namespace: jerry
+  labels:
+    app: website
+    scenario: "1"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: website
+  template:
+    metadata:
+      labels:
+        app: website
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27               # was: nginx:v999
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+
+---
+# --- Scenario 2: worker ---
+# PROBLEM: ConfigMap "worker-config" doesn't exist → CreateContainerConfigError
+# K9S: :pod → d → Events: "configmap worker-config not found"
+#      :cm → confirm it's missing
+# FIX: Create the ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: worker-config
+  namespace: jerry
+data:
+  app.conf: |
+    mode=production
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: jerry
+  labels:
+    app: worker
+    scenario: "2"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+        - name: worker
+          image: busybox:1.36
+          command: ["/bin/sh", "-c", "cat /config/app.conf && sleep 3600"]
+          volumeMounts:
+            - name: config
+              mountPath: /config
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 25m
+            limits:
+              memory: 64Mi
+              cpu: 50m
+      volumes:
+        - name: config
+          configMap:
+            name: worker-config
+
+---
+# --- Scenario 3: api ---
+# PROBLEM: Service selector is "app: api-server" but pods have "app: api" → no Endpoints
+# K9S: :svc → select api → d → Endpoints: <none>
+#      Compare Service selector to pod labels
+# FIX: Change Service selector to match pod labels
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: jerry
+  labels:
+    app: api
+    scenario: "3"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: hashicorp/http-echo
+          args:
+            - "-text=hello from the api"
+            - "-listen=:5678"
+          ports:
+            - containerPort: 5678
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 25m
+            limits:
+              memory: 64Mi
+              cpu: 50m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: jerry
+  labels:
+    app: api
+    scenario: "3"
+spec:
+  selector:
+    app: api                              # was: api-server
+  ports:
+    - port: 80
+      targetPort: 5678
+
+---
+# --- Scenario 4: hungry-app ---
+# PROBLEM: Requests 64Gi memory — no node has that much → Pending
+# K9S: :pod → d → Events: "Insufficient memory"
+#      :node → d → check Allocatable memory
+# FIX: Change 64Gi to 64Mi
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hungry-app
+  namespace: jerry
+  labels:
+    app: hungry-app
+    scenario: "4"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hungry-app
+  template:
+    metadata:
+      labels:
+        app: hungry-app
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27
+          resources:
+            requests:
+              memory: 64Mi              # was: 64Gi
+              cpu: 50m
+            limits:
+              memory: 128Mi             # was: 64Gi
+              cpu: 100m
+
+---
+# --- Scenario 5: backend ---
+# PROBLEM: Secret "db-credentials" doesn't exist → CreateContainerConfigError
+# K9S: :pod → d → Events: "secret db-credentials not found"
+#      :sec → confirm it's missing
+# FIX: Create the Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+  namespace: jerry
+type: Opaque
+data:
+  # "supersecret" base64 encoded
+  password: c3VwZXJzZWNyZXQ=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: jerry
+  labels:
+    app: backend
+    scenario: "5"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: nginx:1.27
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+
+---
+# --- Scenario 6: logger ---
+# PROBLEM: Container exits with code 1 (no database) → CrashLoopBackOff
+# K9S: :pod → l (logs) → see "ERROR: connection refused" then exit
+#      p (previous logs) to see crashed container output
+# FIX: Remove the exit 1 (or deploy a database)
+# LESSON: This is an application problem, not a Kubernetes problem.
+#         k9s logs tell you the container is crashing on purpose.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logger
+  namespace: jerry
+  labels:
+    app: logger
+    scenario: "6"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logger
+  template:
+    metadata:
+      labels:
+        app: logger
+    spec:
+      containers:
+        - name: logger
+          image: busybox:1.36
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Logger starting up..."
+              echo "Connecting to database at $DB_HOST..."
+              sleep 2
+              echo "WARNING: database not available, running in standalone mode"
+              sleep 3600
+          env:
+            - name: DB_HOST
+              value: "postgres.jerry.svc.cluster.local"
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 25m
+            limits:
+              memory: 64Mi
+              cpu: 50m

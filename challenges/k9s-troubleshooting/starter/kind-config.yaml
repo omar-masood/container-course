@@ -1,0 +1,9 @@
+# kind cluster with constrained resources to make scheduling
+# failures realistic. Two worker nodes so you can observe
+# pod distribution and node-level issues.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+  - role: worker
+  - role: worker

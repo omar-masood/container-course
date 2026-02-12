@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+data:
+  redis.conf: |
+    # Require password authentication
+    requirepass redis-lab-password
+
+    # Persistence — append-only file for durability
+    appendonly yes
+    appendfsync everysec
+
+    # Memory limit appropriate for learning environment
+    maxmemory 128mb
+    maxmemory-policy allkeys-lru
+
+    # Bind to all interfaces (required in containers)
+    bind 0.0.0.0
+
+    # Disable dangerous commands in shared environments
+    rename-command FLUSHALL ""
+    rename-command FLUSHDB ""

@@ -1,0 +1,64 @@
+# Minecraft Server Helm Values
+# Chart: itzg/minecraft
+# Repo:  https://itzg.github.io/minecraft-server-charts/
+
+# --- Workload Type ---
+# Use a StatefulSet instead of a Deployment.
+# Minecraft needs stable identity and stable storage —
+# the same reasons you used a StatefulSet for Redis.
+workloadAsStatefulSet: true
+
+# --- Resource Limits ---
+# Minecraft is memory-hungry. The JVM heap (minecraftServer.memory)
+# is 1G, but the container needs extra headroom for JVM overhead.
+# Rule of thumb: container limit = heap + 25-50%.
+resources:
+  requests:
+    memory: 1536Mi
+    cpu: 500m
+  limits:
+    memory: 1536Mi
+    cpu: 1000m
+
+# --- Persistence ---
+# Without this, world data lives in an emptyDir and vanishes
+# when the pod dies. With it, a PVC is created and mounted at /data.
+persistence:
+  dataDir:
+    enabled: true
+    Size: 2Gi
+
+# --- Server Configuration ---
+minecraftServer:
+  # You MUST accept the Minecraft EULA to start the server.
+  eula: "TRUE"
+
+  # Server version — pin to a specific version for reproducibility,
+  # or use LATEST for the newest release.
+  version: "LATEST"
+  type: VANILLA
+
+  # Game settings
+  gameMode: survival
+  difficulty: normal
+  maxPlayers: 10
+  pvp: true
+  motd: "Kubernetes Minecraft Lab - Welcome!"
+
+  # JVM heap size — this controls -Xms and -Xmx.
+  # Must be less than resources.limits.memory (see above).
+  memory: 1024M
+
+  # Expose the game port on the kind node so you can
+  # connect from localhost:25565 with a Minecraft client.
+  serviceType: NodePort
+  nodePort: 25565
+
+  # RCON (Remote Console) — admin access without joining the game.
+  # The chart creates a Kubernetes Secret for the password
+  # and a separate ClusterIP Service on port 25575.
+  rcon:
+    enabled: true
+    password: "k8s-minecraft-rcon"
+    port: 25575
+    serviceType: ClusterIP

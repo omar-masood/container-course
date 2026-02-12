@@ -1,0 +1,15 @@
+# Stretch Goal: VS Code settings as a ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: code-server-settings
+  namespace: code-server
+data:
+  settings.json: |
+    {
+      "editor.fontSize": 16,
+      "editor.tabSize": 2,
+      "workbench.colorTheme": "Default Dark Modern",
+      "terminal.integrated.defaultProfile.linux": "bash",
+      "editor.minimap.enabled": false
+    }

@@ -1,0 +1,11 @@
+# kind cluster config with port mapping for Minecraft game traffic.
+# Maps host port 25565 → container port 25565 so you can connect
+# from localhost with a Minecraft client.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 25565
+        hostPort: 25565
+        protocol: TCP

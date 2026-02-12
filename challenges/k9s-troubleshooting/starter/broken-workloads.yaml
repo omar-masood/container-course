@@ -1,0 +1,246 @@
+# ============================================================
+# Jerry's Broken Cluster
+# ============================================================
+# Jerry deployed six workloads before going on vacation.
+# None of them are working. Your job: use k9s to find out
+# why each one is broken and fix it.
+#
+# Apply this file, then open k9s and start investigating.
+# DO NOT read this file before trying to diagnose the issues
+# in k9s — that defeats the purpose.
+# ============================================================
+
+---
+# --- Workload 1: "website" ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website
+  namespace: jerry
+  labels:
+    app: website
+    scenario: "1"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: website
+  template:
+    metadata:
+      labels:
+        app: website
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:v999
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+
+---
+# --- Workload 2: "worker" ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: jerry
+  labels:
+    app: worker
+    scenario: "2"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+        - name: worker
+          image: busybox:1.36
+          command: ["/bin/sh", "-c", "cat /config/app.conf && sleep 3600"]
+          volumeMounts:
+            - name: config
+              mountPath: /config
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 25m
+            limits:
+              memory: 64Mi
+              cpu: 50m
+      volumes:
+        - name: config
+          configMap:
+            name: worker-config
+
+---
+# --- Workload 3: "api" ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: jerry
+  labels:
+    app: api
+    scenario: "3"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: hashicorp/http-echo
+          args:
+            - "-text=hello from the api"
+            - "-listen=:5678"
+          ports:
+            - containerPort: 5678
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 25m
+            limits:
+              memory: 64Mi
+              cpu: 50m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: jerry
+  labels:
+    app: api
+    scenario: "3"
+spec:
+  selector:
+    app: api-server
+  ports:
+    - port: 80
+      targetPort: 5678
+
+---
+# --- Workload 4: "hungry-app" ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hungry-app
+  namespace: jerry
+  labels:
+    app: hungry-app
+    scenario: "4"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hungry-app
+  template:
+    metadata:
+      labels:
+        app: hungry-app
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.27
+          resources:
+            requests:
+              memory: 64Gi
+              cpu: 50m
+            limits:
+              memory: 64Gi
+              cpu: 100m
+
+---
+# --- Workload 5: "backend" ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: jerry
+  labels:
+    app: backend
+    scenario: "5"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: nginx:1.27
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+
+---
+# --- Workload 6: "logger" ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logger
+  namespace: jerry
+  labels:
+    app: logger
+    scenario: "6"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logger
+  template:
+    metadata:
+      labels:
+        app: logger
+    spec:
+      containers:
+        - name: logger
+          image: busybox:1.36
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Logger starting up..."
+              echo "Connecting to database at $DB_HOST..."
+              sleep 2
+              echo "ERROR: connection refused to $DB_HOST:5432"
+              exit 1
+          env:
+            - name: DB_HOST
+              value: "postgres.jerry.svc.cluster.local"
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 25m
+            limits:
+              memory: 64Mi
+              cpu: 50m
