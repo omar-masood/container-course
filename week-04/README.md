@@ -99,7 +99,7 @@ This mirrors how real teams work. Developers don't `kubectl apply` to production
 | 1:10 - 1:25 | Break | — |
 | 1:25 - 1:45 | Pods, Deployments, Services: The Core Objects | Lecture |
 | 1:45 - 2:25 | **Lab 2:** Deploy, Scale, Update, Debug | Hands-on |
-| 2:25 - 2:50 | **Lab 3:** GitOps Submission — Ship to Production | Hands-on |
+| 2:25 - 2:50 | **Lab 3:** GitOps Submission — Ship Dev to Production | Hands-on |
 | 2:50 - 3:00 | Wrap-up & Homework Introduction | — |
 
 ---
@@ -256,16 +256,16 @@ You'll:
 - Perform a rolling update with zero downtime
 - Break things on purpose and debug with `kubectl describe`, `logs`, and `exec`
 
-### Lab 3: GitOps Submission — Ship to Production
+### Lab 3: GitOps Submission — Ship Dev to Production
 
 📁 See [labs/lab-03-gitops-submission/](./labs/lab-03-gitops-submission/)
 
 You'll:
 - Push your updated image to GHCR
-- Write Kubernetes manifests for the gitops repo
-- Submit a pull request to `container-gitops`
+- Write Kubernetes manifests for your dev namespace
+- Submit a pull request to `talos-gitops`
 - Watch ArgoCD deploy your app to the shared cluster
-- Verify your app is live with a public URL
+- Verify your dev environment is live
 
 ---
 
@@ -287,7 +287,13 @@ Answer these in your own words after completing the labs:
 
 ## Homework
 
-Complete these exercises in the container-gym before next class:
+Complete these before next class:
+
+| Exercise | Time | Focus |
+|----------|------|-------|
+| **Add prod namespace** | 20 min | Add a `prod/` directory to your `talos-gitops` student directory, update the root kustomization, and submit a PR — same process as Lab 3, different namespace |
+
+Plus these exercises in the container-gym:
 
 | Exercise | Time | Focus |
 |----------|------|-------|

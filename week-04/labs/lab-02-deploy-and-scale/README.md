@@ -259,7 +259,7 @@ kill %1
 > # Kill all backgrounded jobs in this shell
 > kill %1 %2 %3 2>/dev/null
 > # Or find and kill whatever is holding the port
-> kill $(lsof -ti :8080)
+> kill $(lsof -ti :5000)
 > ```
 > This will come up again in Parts 4 and 5 — always kill the previous port-forward before starting a new one.
 
@@ -322,21 +322,16 @@ kubectl scale deployment student-app --replicas=3
 kubectl get pods -w
 ```
 
-Once all 3 are running, forward the Service and hit `/info` repeatedly:
+Once all 3 are running, hit the Service from **inside** the cluster to see load balancing in action:
 
 ```bash
-kubectl port-forward service/student-app-svc 8080:80 &
-
-# Hit it multiple times — watch the pod_name change
-curl -s localhost:8080/info | python3 -m json.tool | grep pod_name
-curl -s localhost:8080/info | python3 -m json.tool | grep pod_name
-curl -s localhost:8080/info | python3 -m json.tool | grep pod_name
-curl -s localhost:8080/info | python3 -m json.tool | grep pod_name
-
-kill %1
+kubectl run curl-test --rm -it --restart=Never --image=curlimages/curl -- \
+  sh -c 'for i in $(seq 1 10); do curl -s http://student-app-svc/info 2>/dev/null | grep pod_name; done'
 ```
 
 Different pod names. The Service is load-balancing across your 3 replicas. Each request might hit a different pod. This is why the `/info` endpoint exists — it makes the abstract concept of "replicas" concrete and visible.
+
+> **Why not `kubectl port-forward`?** Port-forwarding bypasses the Service's load balancing. It picks a single pod and tunnels directly to it, so every request hits the same pod. To see real load balancing, you need to go through the cluster network where kube-proxy routes traffic — that's what `kubectl run` does here by curling from inside the cluster.
 
 ### Kill a Pod and Watch Self-Healing
 
@@ -536,6 +531,12 @@ Before moving on, verify you can:
 - [ ] Debug `ImagePullBackOff` with `kubectl describe`
 - [ ] Debug `CrashLoopBackOff` with `kubectl logs`
 - [ ] Exec into a running pod with `kubectl exec`
+
+---
+
+## Demo
+
+![Kubernetes Deploy Demo](../../../assets/week-04-lab-02-k8s-deploy.gif)
 
 ---
 

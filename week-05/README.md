@@ -202,7 +202,7 @@ You'll learn all three and choose one for your production deployment.
 
 ### Lab 1: Install Redis & Vault with Helm
 
-📁 See [labs/lab-01-helm-and-redis/](./labs/lab-01-helm-and-redis/)
+📁 See [labs/lab-01-helm-redis-and-vault/](./labs/lab-01-helm-redis-and-vault/)
 
 You'll:
 - Add Helm repositories and search for charts
@@ -255,12 +255,15 @@ Answer these in your own words after completing the labs:
 
 Complete these exercises in the container-gym before next class:
 
+Week 05-specific secret/state scenarios are being added to `gymctl`.  
+Use this mapped reinforcement set for now (all exercises are currently available):
+
 | Exercise | Time | Focus |
 |----------|------|-------|
-| `jerry-hardcoded-password` | 20 min | Jerry put the DB password in the Dockerfile |
-| `configmap-hot-reload` | 20 min | Update config without restarting pods |
-| `pvc-data-recovery` | 20 min | Data disappeared — the PVC binding is wrong |
-| `secret-rotation` | 25 min | Rotate a secret without downtime |
+| `jerry-missing-configmap` | 20 min | Debug ConfigMap dependencies and recover pod startup |
+| `jerry-probe-failures` | 20 min | Tune startup/readiness behavior for slower services |
+| `jerry-wrong-namespace` | 20 min | Fix cross-namespace service discovery using FQDNs |
+| `jerry-forgot-resources` | 25 min | Add resource requests/limits to stabilize workloads |
 
 ---
 

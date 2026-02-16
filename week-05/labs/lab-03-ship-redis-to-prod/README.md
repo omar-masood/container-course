@@ -7,7 +7,7 @@
 
 ## What's Changed Since Week 4
 
-In Week 4's Lab 3, you created your student directory in `talos-gitops` from scratch — a namespace, deployment, service, and kustomization for dev and prod. ArgoCD deployed your self-contained v4 app.
+In Week 4, you created your student directory in `talos-gitops` from scratch — a namespace, deployment, service, and kustomization for dev (in-class) and prod (homework). ArgoCD deployed your self-contained v4 app.
 
 This week you're evolving that directory. Your app is no longer self-contained — it needs Redis. That means your gitops directory needs to grow:
 

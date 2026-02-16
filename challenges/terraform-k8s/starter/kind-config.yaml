@@ -1,0 +1,11 @@
+# kind cluster config with port mapping for the challenge app.
+# Maps host port 8080 → container port 30080 so you can
+# reach the NodePort Service from localhost.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 8080
+        protocol: TCP
