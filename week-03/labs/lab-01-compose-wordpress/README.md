@@ -11,6 +11,20 @@ Deploy a working WordPress site backed by a MySQL database. No manual `docker ru
 
 ---
 
+## Background: How Compose Orchestrates Multi-Container Apps
+
+Compose is a local application model, not just a shortcut for long `docker run` commands. A Compose file declares services, networks, and volumes as one unit so Docker can create a consistent runtime graph every time. In this lab, WordPress and MySQL are separate services with different startup behavior, but Compose makes them part of one managed stack.
+
+Service-to-service connectivity works through an auto-created network and embedded DNS. Each service name becomes a resolvable hostname on that network, so `WORDPRESS_DB_HOST: db` is not a magic string; it is a DNS name that resolves to the database container. This is the same pattern you later use in Kubernetes Services, just with Compose's local network scope.
+
+Startup order and readiness are different problems. `depends_on` controls when Compose starts containers, but without a health check you can still start WordPress before MySQL is actually accepting connections. Adding a database health check plus `condition: service_healthy` turns this into readiness-aware startup and removes a common source of intermittent boot failures.
+
+Volumes are the persistence boundary in this architecture. Containers are replaceable processes, while MySQL data must survive container recreation, so the database writes to a named volume managed outside the container filesystem. In AWS terms, think of this like replacing an EC2 instance while reattaching the same durable storage.
+
+If you keep these four concepts in mind (application graph, network DNS, readiness gating, and persistent volumes), every command in this lab will feel mechanical instead of magical. For deeper details, see the official Docker Compose documentation: https://docs.docker.com/compose/.
+
+---
+
 ## Part 1: Write the Compose File
 
 Create a new `docker-compose.yml` in the `starter` directory:

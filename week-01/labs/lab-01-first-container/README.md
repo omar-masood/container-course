@@ -5,6 +5,20 @@
 
 ---
 
+## Background: What a Container Actually Is
+
+An image is a read-only template, and a container is a running instance of that template with a thin writable layer on top. If you remember one distinction for the entire course, use this one: images are build artifacts, containers are runtime processes. Deleting a container does not delete its image, and creating a new container from the same image starts with a fresh writable layer unless you mount external storage.
+
+`docker run` does two jobs: create and start. It creates container metadata from the image config, then starts the container's main process as PID 1 inside isolated namespaces. A container stays alive only while that PID 1 process is alive, which is why debugging often starts with logs and process state rather than "is Docker up." In this lab, nginx is that long-running process.
+
+Port publishing like `-p 8080:80` is host-to-container network translation, not a change inside nginx itself. Your host listens on port 8080 and forwards traffic into container port 80 where nginx serves requests. That is why two containers cannot both publish the same host port at the same time even if they expose the same internal port.
+
+`docker exec` adds a new process into an already-running container; it does not restart or replace the main process. This is useful because it lets you inspect filesystem, environment, and running processes in place while the application keeps serving traffic. Treat it as live inspection, not lifecycle control.
+
+The lifecycle commands in this lab map to real operational behaviors: stop sends a graceful signal first, kill is immediate, start restarts an existing stopped container, and remove deletes the container metadata plus writable layer. For deeper details, see the official Docker containers documentation: https://docs.docker.com/engine/containers/.
+
+---
+
 ## Part 1: Run Your First Container
 
 ### Pull and Run nginx

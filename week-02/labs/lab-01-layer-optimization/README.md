@@ -192,6 +192,51 @@ Even faster! Smaller build context means less to send to Docker daemon.
 
 ---
 
+## Part 7 (Optional): Generate Benchmark Charts from Real Runs
+
+If you want hard numbers (plus charts) for before/after comparison, run:
+
+```bash
+cd week-02/labs/lab-01-layer-optimization
+python3 scripts/benchmark_build_cache.py
+```
+
+Requirements:
+- Docker running
+- Python 3
+- `matplotlib` installed (for PNG chart output)
+
+If `matplotlib` is not available yet, you can still collect benchmark data:
+
+```bash
+python3 scripts/benchmark_build_cache.py --no-charts
+```
+
+This runs four real builds:
+- `slow_cold` (`Dockerfile`, `--no-cache`)
+- `slow_rebuild` (`Dockerfile`, after a tiny `app.py` change)
+- `fast_cold` (`Dockerfile.optimized`, `--no-cache`)
+- `fast_rebuild` (`Dockerfile.optimized`, after a tiny `app.py` change)
+
+Artifacts are written to:
+
+```text
+assets/generated/week-02-layer-cache/
+  build_times.png
+  cache_effectiveness.png
+  summary.md
+  results.json
+  logs/
+```
+
+Use those files to show measured speedup and cache-hit differences in class.
+
+![Build Time Benchmark Chart](../../../assets/generated/week-02-layer-cache/build_times.png)
+
+![Layer Cache Effectiveness Chart](../../../assets/generated/week-02-layer-cache/cache_effectiveness.png)
+
+---
+
 ## Checkpoint ✅
 
 You should now understand:

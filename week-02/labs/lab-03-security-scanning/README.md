@@ -330,6 +330,45 @@ Use with caution and document WHY you're ignoring it!
 
 ---
 
+## Part 9 (Optional): Generate Trivy Trend Charts from Real Scans
+
+If you want measured before/after vulnerability trends for `v1`, `v2`, and `v3`:
+
+```bash
+cd week-02/labs/lab-03-security-scanning
+python3 scripts/benchmark_trivy_scan.py
+```
+
+Requirements:
+- Docker running
+- Trivy installed (`trivy --version`)
+- Python 3
+- `matplotlib` installed (for PNG chart output)
+
+If `matplotlib` is not available yet, you can still collect scan data:
+
+```bash
+python3 scripts/benchmark_trivy_scan.py --no-charts
+```
+
+Artifacts are written to:
+
+```text
+assets/generated/week-02-trivy-scan/
+  trivy_severity_stacked.png
+  trivy_high_critical_trend.png
+  summary.md
+  results.json
+  logs/
+  scans/
+```
+
+![Trivy Severity Breakdown Chart](../../../assets/generated/week-02-trivy-scan/trivy_severity_stacked.png)
+
+![Trivy High+Critical Trend Chart](../../../assets/generated/week-02-trivy-scan/trivy_high_critical_trend.png)
+
+---
+
 ## Checkpoint ✅
 
 You should now be able to:

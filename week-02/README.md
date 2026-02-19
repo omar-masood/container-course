@@ -232,6 +232,22 @@ You'll:
 
 ---
 
+## Generated Visualizations
+
+### Lab 1: Layer Cache Benchmark
+
+![Layer Cache Build Times](../assets/generated/week-02-layer-cache/build_times.png)
+
+![Layer Cache Effectiveness](../assets/generated/week-02-layer-cache/cache_effectiveness.png)
+
+### Lab 3: Trivy Vulnerability Trend
+
+![Trivy Severity Breakdown](../assets/generated/week-02-trivy-scan/trivy_severity_stacked.png)
+
+![Trivy High+Critical Trend](../assets/generated/week-02-trivy-scan/trivy_high_critical_trend.png)
+
+---
+
 ## Discovery Questions
 
 Answer these in your own words after completing the labs:

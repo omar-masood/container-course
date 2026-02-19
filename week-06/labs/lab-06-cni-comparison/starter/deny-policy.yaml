@@ -1,0 +1,15 @@
+---
+# Denies all ingress to the server pod.
+# With kindnet: this policy is silently ignored — traffic still flows.
+# With Calico or Cilium: connections from client will time out.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-server-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app: server
+  policyTypes:
+  - Ingress
+  ingress: []

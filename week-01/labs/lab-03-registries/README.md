@@ -15,6 +15,20 @@ We'll use two registries:
 
 ---
 
+## Background: How Container Registries Work
+
+A registry stores image content as immutable layers plus a manifest that lists which layers make up a tagged image. When you push, Docker uploads only layers the registry does not already have, then publishes the tag by writing or updating the manifest reference. That is why pushes can be fast after small changes and why you often see "layer already exists" during uploads.
+
+A tag is a movable pointer, not a cryptographic identity. `my-app:v1` can be retagged to different content later unless your team enforces immutability policies, while a digest like `@sha256:...` uniquely identifies exact bytes. In production systems, tags are convenient for humans and digests are safer for deterministic deployments.
+
+Auth and authorization are separate concerns here. `docker login` stores credentials locally, but actual push or pull permissions come from registry-side policies tied to your account or token scopes. In AWS terms, this is similar to authenticating your CLI and then being allowed or denied by ECR/IAM policy for a specific repository action.
+
+Docker Hub and GHCR both implement OCI distribution, so the mechanics are the same even though account model and defaults differ. Docker Hub defaults to a global namespace model, while GHCR aligns image access with GitHub users, orgs, and repository permissions. The command sequence in this lab is mostly about naming and credentials, not different image formats.
+
+Keep one practical rule in mind as you work: push once, then verify by pulling into a clean local state so you know the registry copy is truly usable by other systems. For deeper reference, see the Docker registry documentation: https://docs.docker.com/docker-hub/repos/.
+
+---
+
 ## Part 1: Docker Hub
 
 ### Create a Docker Hub Account
