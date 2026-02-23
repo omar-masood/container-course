@@ -1,0 +1,34 @@
+# ============================================================
+# k8sgpt Operator Configuration
+# ============================================================
+# 1. Create the Secret with your OpenRouter key first:
+#      kubectl create secret generic k8sgpt-secret \
+#        --from-literal=openai-api-key=YOUR_OPENROUTER_KEY \
+#        -n k8sgpt-operator-system
+#
+# 2. Then apply this file:
+#      kubectl apply -f starter/k8sgpt-cr.yaml
+# ============================================================
+
+apiVersion: core.k8sgpt.ai/v1alpha1
+kind: K8sGPT
+metadata:
+  name: k8sgpt
+  namespace: k8sgpt-operator-system
+spec:
+  # Pinned to an image build compatible with the operator's generated
+  # `serve --filter` arguments used in this challenge.
+  version: "202512220901"
+  ai:
+    enabled: true
+    model: openai/gpt-4o-mini
+    backend: openai
+    baseUrl: https://openrouter.ai/api/v1
+    secret:
+      name: k8sgpt-secret
+      key: openai-api-key
+  noCache: false
+  filters:
+    - Pod
+    - Service
+    - PersistentVolumeClaim

@@ -1,0 +1,257 @@
+# ============================================================
+# Fixed Workloads — Instructor Reference
+# ============================================================
+# What was wrong with each workload and why k8sgpt catches it.
+
+---
+# Fix 1: storefront — add the missing PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: storefront-data
+  namespace: jerry-ai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storefront
+  namespace: jerry-ai
+  labels:
+    app: storefront
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: storefront
+  template:
+    metadata:
+      labels:
+        app: storefront
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: storefront-data
+
+---
+# Fix 2: payment-processor — create the missing Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: payment-secrets
+  namespace: jerry-ai
+type: Opaque
+stringData:
+  db-password: "supersecret-dev-password"
+  stripe-api-key: "sk_test_placeholder"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-processor
+  namespace: jerry-ai
+  labels:
+    app: payment-processor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payment-processor
+  template:
+    metadata:
+      labels:
+        app: payment-processor
+    spec:
+      containers:
+        - name: payment
+          image: busybox:1.36
+          command: ["/bin/sh", "-c", "echo 'Payment service starting'; sleep 3600"]
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secrets
+                  key: db-password
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: payment-secrets
+                  key: stripe-api-key
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+
+---
+# Fix 3: recommendation-engine — reduce absurd resource requests
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation-engine
+  namespace: jerry-ai
+  labels:
+    app: recommendation-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommendation-engine
+  template:
+    metadata:
+      labels:
+        app: recommendation-engine
+    spec:
+      containers:
+        - name: model
+          image: python:3.11-slim
+          command: ["/bin/sh", "-c", "pip install flask && python -c \"from flask import Flask; app = Flask(__name__); app.run(host='0.0.0.0', port=8080)\""]
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+
+---
+# Fix 4: notification-service — rename ConfigMap key to match mount
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notifier-config
+  namespace: jerry-ai
+data:
+  # Renamed from settings.yaml to config.yaml to match the volumeMount
+  config.yaml: |
+    smtp_host: mail.example.com
+    smtp_port: 587
+    from_address: jerry@example.com
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: jerry-ai
+  labels:
+    app: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+        - name: notifier
+          image: busybox:1.36
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "Loading email config from /etc/notifier/config.yaml"
+              cat /etc/notifier/config.yaml
+              echo "Starting notification service..."
+              sleep 3600
+          volumeMounts:
+            - name: notifier-config
+              mountPath: /etc/notifier
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 25m
+            limits:
+              memory: 64Mi
+              cpu: 50m
+      volumes:
+        - name: notifier-config
+          configMap:
+            name: notifier-config
+            items:
+              - key: config.yaml
+                path: config.yaml
+
+---
+# Fix 5: analytics-api Service — correct targetPort from 8080 to 9090
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-api
+  namespace: jerry-ai
+  labels:
+    app: analytics
+spec:
+  selector:
+    app: analytics
+  ports:
+    - name: http
+      port: 80
+      targetPort: 9090
+
+---
+# Fix 6: cache-layer — fix readinessProbe to ping localhost
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache-layer
+  namespace: jerry-ai
+  labels:
+    app: cache-layer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cache-layer
+  template:
+    metadata:
+      labels:
+        app: cache-layer
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.2
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+          readinessProbe:
+            exec:
+              command:
+                - redis-cli
+                - -h
+                - "localhost"
+                - ping
+            initialDelaySeconds: 5
+            periodSeconds: 10
