@@ -1,7 +1,24 @@
+![Lab 01 Create Your kind Cluster and Explore](../../../assets/generated/week-04-lab-01/hero.png)
+![Lab 01 kind cluster bootstrap and exploration](../../../assets/generated/week-04-lab-01/flow.gif)
+
+---
+
 # Lab 1: Create Your kind Cluster & Explore
 
 **Time:** 30 minutes  
 **Objective:** Stand up a local Kubernetes cluster, learn essential kubectl commands, and discover that your Week 1 apps are already running on Kubernetes
+
+---
+
+## The Story
+
+You are the on-call engineer and a teammate says, "the app is down in Kubernetes." If you cannot build a disposable cluster quickly and inspect core system components with confidence, every later debugging step gets slower and riskier. This lab gives you that baseline: create a local cluster fast, verify it, and switch contexts safely between local and shared environments.
+
+---
+
+## Background: kind, Contexts, and Safe Cluster Access
+
+kind runs Kubernetes nodes as Docker containers, which makes it ideal for repeatable lab work where you can break and rebuild without risk to shared environments. `kubectl` contexts are your safety rail when multiple clusters are configured in one kubeconfig. Before any mutating command, confirm the active context so you do not target the wrong cluster.
 
 ---
 
@@ -328,7 +345,7 @@ It's gone. Permanently. There's no controller watching this pod because we creat
 
 ---
 
-## Checkpoint ✅
+## Verification Checklist
 
 Before moving on, verify:
 
@@ -343,3 +360,10 @@ Before moving on, verify:
 ## Next Lab
 
 Continue to [Lab 2: Deploy, Scale, Update, Debug](../lab-02-deploy-and-scale/)
+
+---
+
+## Reinforcement Scenarios
+
+- `jerry-kubeconfig-context-confusion`
+- `jerry-node-notready-kubelet`

@@ -1,3 +1,8 @@
+![Lab 02 Wire Your App to Redis](../../../assets/generated/week-05-lab-02/hero.png)
+![Lab 02 ConfigMap and wiring workflow](../../../assets/generated/week-05-lab-02/flow.gif)
+
+---
+
 # Lab 2: Wire Your App to Redis
 
 **Time:** 35 minutes  
@@ -12,6 +17,12 @@ Your app has been self-contained — it serves a page and that's it. No database
 That changes now. Your app gets a Redis backend. A visit counter that persists across pod restarts. Configuration that lives outside the container image. Passwords that come from Kubernetes objects, not hardcoded strings.
 
 By the end of this lab, your pod will read its Redis connection info from a ConfigMap, its Redis password from a Secret, and Redis will store data on a PVC that survives pod deletion.
+
+---
+
+## Background: Externalized Config and Stateful Dependencies
+
+Production apps should be portable artifacts with environment-specific configuration injected at runtime. ConfigMaps carry non-sensitive settings, Secrets carry sensitive values, and StatefulSets with PVCs preserve backing data across pod restarts. This split is the foundation for twelve-factor app behavior in Kubernetes.
 
 ---
 
@@ -382,7 +393,7 @@ kill %1
 
 ---
 
-## Checkpoint ✅
+## Verification Checklist
 
 Before moving on, verify:
 
@@ -395,6 +406,13 @@ Before moving on, verify:
 - [ ] You understand that env-based ConfigMap changes require a pod restart
 
 **One thing should bother you:** your `secret.yaml` has the Redis password in plain text. Anyone who clones your repo can read it. We'll fix this with proper secret management in a later week. For now, the goal is to understand how ConfigMaps and Secrets work mechanically.
+
+---
+
+## Reinforcement Scenarios
+
+- `jerry-missing-configmap`
+- `jerry-wrong-namespace`
 
 ---
 

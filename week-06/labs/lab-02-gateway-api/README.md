@@ -1,3 +1,8 @@
+![Lab 02 Gateway API on the Shared Cluster](../../../assets/generated/week-06-lab-02/hero.png)
+![Lab 02 Gateway API routing workflow](../../../assets/generated/week-06-lab-02/flow.gif)
+
+---
+
 # Lab 2: Gateway API on the Shared Cluster
 
 **Time:** 40 minutes  
@@ -258,10 +263,16 @@ Pod: uptime-kuma-xxxxx:3001
 
 ---
 
-## Checkpoint
+## Verification Checklist
 
 You are done when:
 - Uptime Kuma is running in your dev namespace with a PVC bound
 - Your HTTPRoute is attached to `cilium-gateway`
 - `https://<you>.status.lab.shart.cloud` loads
 - You have three monitors and a public status page
+
+---
+
+## Reinforcement Scenarios
+
+- `jerry-gateway-route-detached`

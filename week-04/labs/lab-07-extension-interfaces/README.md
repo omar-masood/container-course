@@ -1,7 +1,18 @@
+![Lab 07 Extension Interfaces Deep Dive](../../../assets/generated/week-04-lab-07/hero.png)
+![Lab 07 CRI CNI CSI discovery workflow](../../../assets/generated/week-04-lab-07/flow.gif)
+
+---
+
 # Lab 7: Extension Interfaces Deep Dive
 
 **Time:** 35 minutes
 **Objective:** Explore and understand the CRI, CNI, and CSI extension interfaces that enable Kubernetes to work with different container runtimes, networks, and storage systems.
+
+---
+
+## The Story
+
+When pods fail, the fastest path to root cause is knowing which subsystem owns the failure: runtime, network, or storage. This lab sharpens that boundary awareness by mapping CRI, CNI, and CSI to concrete files, sockets, and failure signatures.
 
 ---
 
@@ -269,7 +280,7 @@ Fill out this table based on your observations:
 
 ---
 
-## Validation Checklist
+## Verification Checklist
 
 You are done when:
 
@@ -288,6 +299,6 @@ kubectl delete namespace csi-test
 
 ---
 
-## Reinforcement Scenario
+## Reinforcement Scenarios
 
 - `jerry-wrong-cni-config`

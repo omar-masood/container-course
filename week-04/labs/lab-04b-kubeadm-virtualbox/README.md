@@ -1,7 +1,18 @@
+![Lab 04b kubeadm Full Lifecycle on VirtualBox](../../../assets/generated/week-04-lab-04b/hero.png)
+![Lab 04b VirtualBox cluster workflow](../../../assets/generated/week-04-lab-04b/flow.gif)
+
+---
+
 # Lab 4b: kubeadm Full Lifecycle on VirtualBox
 
 **Time:** 120 minutes (can be done as homework)
 **Objective:** Experience the complete kubeadm cluster lifecycle on real virtual machines: init, join, CNI installation, upgrade, and reset.
+
+---
+
+## The Story
+
+Teams rarely fail on happy-path install commands; they fail during lifecycle moments like upgrades, joins, and node recovery. This extended lab gives you full-stack kubeadm operations on real VMs so you can diagnose failures where they actually happen: binaries, kubelet, static pods, CNI, and version-skew boundaries.
 
 ---
 
@@ -387,7 +398,7 @@ During the lab, explicitly identify:
 
 ---
 
-## Validation Checklist
+## Verification Checklist
 
 You are done when:
 
@@ -420,7 +431,7 @@ You are done when:
 
 ---
 
-## Reinforcement Connection
+## Reinforcement Scenarios
 
 This lab connects to these gym scenarios:
 - `jerry-kubeconfig-context-confusion`

@@ -1,7 +1,18 @@
+![Lab 06 Pod Security Admission Deep Dive](../../../assets/generated/week-04-lab-06/hero.png)
+![Lab 06 Pod Security Admission enforcement workflow](../../../assets/generated/week-04-lab-06/flow.gif)
+
+---
+
 # Lab 6: Pod Security Admission Deep Dive
 
 **Time:** 45 minutes
 **Objective:** Configure Pod Security Standards enforcement at the namespace level and troubleshoot pod admission failures.
+
+---
+
+## The Story
+
+Security policy only helps if it prevents risky workloads before they run. This lab puts you in the operator seat to enforce Pod Security Standards at namespace boundaries, read admission failures precisely, and remediate manifests without weakening policy.
 
 ---
 
@@ -363,7 +374,7 @@ EOF
 
 ---
 
-## Validation Checklist
+## Verification Checklist
 
 You are done when:
 
@@ -382,6 +393,6 @@ kubectl delete namespace psa-demo psa-enforce psa-audit psa-warn psa-production
 
 ---
 
-## Reinforcement Scenario
+## Reinforcement Scenarios
 
 - `jerry-psa-violation`

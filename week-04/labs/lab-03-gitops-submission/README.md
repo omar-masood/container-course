@@ -1,7 +1,24 @@
+![Lab 03 Deploy to Dev via GitOps](../../../assets/generated/week-04-lab-03/hero.png)
+![Lab 03 GitOps submission workflow](../../../assets/generated/week-04-lab-03/flow.gif)
+
+---
+
 # Lab 3: Deploy to Dev via GitOps
 
 **Time:** 25 minutes
 **Objective:** Deploy your app to a dev namespace on the shared cluster by submitting Kubernetes manifests to the infrastructure repo via GitOps
+
+---
+
+## The Story
+
+Manual `kubectl apply` works for one engineer and one cluster until drift appears, reviews are skipped, and nobody can answer what changed. This lab shifts you to production-style delivery: submit desired state through Git, let ArgoCD reconcile it, and validate outcomes in your own namespace.
+
+---
+
+## Background: GitOps and Namespace Isolation
+
+GitOps treats Git as the source of truth and the cluster as a reconciled target. Namespace boundaries provide multi-tenant safety so every student can ship independently without name collisions or broad cluster access. Together, these patterns create an auditable and safer deployment model.
 
 ---
 
@@ -337,7 +354,7 @@ The `/info` endpoint should return pod metadata. Notice that `ENVIRONMENT` shows
 
 ---
 
-## Checkpoint
+## Verification Checklist
 
 Before you're done, verify:
 
@@ -348,3 +365,10 @@ Before you're done, verify:
 - [ ] Your PR is submitted to `ziyotek-edu/talos-gitops` (or merged)
 - [ ] After merge: pods are running in `student-<username>-dev`
 - [ ] After merge: `/info` returns correct `ENVIRONMENT` (your dev namespace name)
+
+---
+
+## Reinforcement Scenarios
+
+- `jerry-gitops-manual-override`
+- `jerry-kubeconfig-context-confusion`
